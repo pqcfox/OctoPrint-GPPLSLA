@@ -11,13 +11,13 @@ class GPPLSLAPlugin(octoprint.plugin.EventHandlerPlugin,
                     octoprint.plugin.StartupPlugin,
                     octoprint.plugin.TemplatePlugin):
     def on_after_startup(self):
-        self._logger.info("Hello World!")
+        self._logger.info("Hello World! image_archive = {}".format(self._settings.get(["image_archive"])))
 
     def get_settings_defaults(self):
-        return dict(image_archive="images")
+        return dict(image_archive="images.tar.gz")
 
-    def get_template_vars(self):
-        return dict(url=self._settings.get(["image_archive"]))
+    def get_template_configs(self):
+        return [dict(type="settings", custom_bindings=False)]
 
     def sending_g420(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         if gcode and gcode == "G420":  # stop laughing
