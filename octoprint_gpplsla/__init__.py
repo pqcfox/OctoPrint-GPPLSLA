@@ -6,9 +6,18 @@ from Tkinter import *
 
 import octoprint.plugin
 
-class GPPLSLAPlugin(octoprint.plugin.StartupPlugin):
+class GPPLSLAPlugin(octoprint.plugin.EventHandlerPlugin,
+                    octoprint.plugin.SettingsPlugin, 
+                    octoprint.plugin.StartupPlugin,
+                    octoprint.plugin.TemplatePlugin):
     def on_after_startup(self):
         self._logger.info("Hello World!")
+
+    def get_settings_defaults(self):
+        return dict(image_archive="images")
+
+    def get_template_vars(self):
+        return dict(url=self._settings.get(["image_archive"]))
 
     def sending_g420(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
         if gcode and gcode == "G420":  # stop laughing
@@ -18,15 +27,15 @@ class GPPLSLAPlugin(octoprint.plugin.StartupPlugin):
             pause = int(re.search(r"P(\d+)", cmd).group(1))
             self.display_image(image_path, pause)
             
-    @static_method
+    @staticmethod
     def get_image_path(image_name):
         pass
             
-    @static_method
+    @staticmethod
     def render_svg():
         pass
 
-    @static_method
+    @staticmethod
     def display_image(image_path, pause):
         root = Tk()
         width = root.winfo_screenwidth()

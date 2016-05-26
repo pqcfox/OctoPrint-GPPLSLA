@@ -1,0 +1,16 @@
+<h4>{{ _('General') }}</h4>
+
+<p>{% trans %}
+    GPPL SLA uses a tar.gz file to store a series of SVG images
+    requested by the custom G420 command for projecting. The
+    following value designates the filename of this SVG archive.
+{% endtrans %}</p>
+
+<form class="form-horizontal">
+    <div class="control-group">
+        <label class="control-label">{{ _('SVG archive name') }}</label>
+        <div class="controls">
+            <input type="text" class="input-block-level" data-bind="value: settings.plugins.gpplsla.image_archive">
+        </div>
+    </div>
+</form>
