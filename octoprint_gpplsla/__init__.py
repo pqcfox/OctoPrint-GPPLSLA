@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 import re
+import tarfile
 from Tkinter import *
 
 import octoprint.plugin
@@ -19,14 +20,22 @@ class GPPLSLAPlugin(octoprint.plugin.EventHandlerPlugin,
     def get_template_configs(self):
         return [dict(type="settings", custom_bindings=False)]
 
-    def sending_g420(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
-        if gcode and gcode == "G420":  # stop laughing
-            self._logger.info("Sending G420: {}".format(cmd))
-            image_name = re.search(r"P(\S+)", cmd).group(1)
-            image_path = self.get_image_path(image_name)
-            pause = int(re.search(r"P(\d+)", cmd).group(1))
-            self.display_image(image_path, pause)
+    def sending_g419_g420(self, comm_instance, phase, cmd, cmd_type, gcode, *args, **kwargs):
+        if gcode:
+            if gcode == "G419":
+                self._logger.info("Sending G419: {}".format(cmd))
+            if gcode == "G420":  # stop laughing
+                self._logger.info("Sending G420: {}".format(cmd))
+                image_name = re.search(r"P(\S+)", cmd).group(1)
+                image_path = self.get_image_path(image_name)
+                pause = int(re.search(r"P(\d+)", cmd).group(1))
+                self.display_image(image_path, pause)
+
+    def on_event(self, event, payload):
+        if event == "PrintStarted":
+            archive = self._settings.get(["image_archive"])
             
+
     @staticmethod
     def get_image_path(image_name):
         pass
@@ -56,4 +65,4 @@ def __plugin_load__():
     __plugin_implementation__ = plugin
 
     global __plugin_hooks__
-    __plugin_hooks__ = {"octoprint.comm.protocol.gcode.sending": plugin.sending_g420}
+    __plugin_hooks__ = {"octoprint.comm.protocol.gcode.sending": plugin.sending_g419_g420}
